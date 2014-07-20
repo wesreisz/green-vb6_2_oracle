@@ -64,6 +64,7 @@ Dim dbDatabase
 
 'On Error Resume Next
 
+
 strDatabase = "xxx" 'From tnsnames.ora
 strUserName = "xxx"
 strPassword = "xxx"
