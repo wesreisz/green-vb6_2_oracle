@@ -50,7 +50,60 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 Private Sub btnExecute_Click()
-    lblResults.Caption = "executing... " + vbCrLf
+    lblResults.Caption = "executing... "
     'call db connect logic
+    testDbConnection
     lblResults.Caption = lblResults.Caption + "completed... "
+End Sub
+
+Private Sub testDbConnection()
+Dim intResult
+Dim strDatabase
+Dim strUserName
+Dim strPassword
+Dim strSQL
+Dim dbDatabase
+Dim snpData
+
+'On Error Resume Next
+
+strDatabase = "xxx" 'From tnsnames.ora
+strUserName = "xxx"
+strPassword = "xxx"
+
+Set snpData = CreateObject("ADODB.Recordset")
+Set dbDatabase = CreateObject("ADODB.Connection")
+
+dbDatabase.ConnectionTimeout = 40
+dbDatabase.ConnectionString = "Provider=OraOLEDB.Oracle;Data Source=" & strDatabase & ";User ID=" & strUserName & ";Password=" & strPassword & ";"
+dbDatabase.Open
+
+If (dbDatabase.State = 1) And (Err = 0) Then
+    strSQL = "SELECT" & vbCrLf
+    strSQL = strSQL & "  SYSDATE CURRENT_DATE" & vbCrLf
+    strSQL = strSQL & "FROM" & vbCrLf
+    strSQL = strSQL & "  DUAL"
+
+    snpData.Open strSQL, dbDatabase
+
+    If snpData.State = 1 Then
+        If Not (snpData.EOF) Then
+            Do While Not (snpData.EOF)
+            lblResults.Caption = lblResults.Caption + CStr(snpData("current_date")) & vbCrLf
+            
+            snpData.MoveNext
+            Loop
+        Else
+            lblResults.Caption = "No Results Found"
+            
+        End If
+        snpData.Close
+    End If
+Else
+    intResult = MsgBox("Could not connect to the database.  Check your user name and password." & vbCrLf & Error(Err), 16, "Oracle Connection Demo")
+End If
+
+dbDatabase.Close
+Set snpData = Nothing
+Set dbDatabase = Nothing
 End Sub
