@@ -9,31 +9,121 @@ Begin VB.Form Form1
    ScaleHeight     =   6225
    ScaleWidth      =   8340
    StartUpPosition =   3  'Windows Default
+   Begin VB.CommandButton btnStoredProcExecute 
+      Caption         =   "Execute"
+      Height          =   495
+      Left            =   6360
+      TabIndex        =   11
+      Top             =   2520
+      Width           =   1935
+   End
+   Begin VB.TextBox txtUserId 
+      Height          =   495
+      Left            =   240
+      TabIndex        =   8
+      Text            =   "99"
+      Top             =   2520
+      Width           =   1215
+   End
+   Begin VB.TextBox txtCreatedBy 
+      Height          =   495
+      Left            =   3960
+      TabIndex        =   4
+      Text            =   "wes"
+      Top             =   2520
+      Width           =   2175
+   End
+   Begin VB.TextBox txtUserName 
+      Height          =   495
+      Left            =   1800
+      TabIndex        =   3
+      Text            =   "sam"
+      Top             =   2520
+      Width           =   1815
+   End
    Begin VB.TextBox txtResults 
-      Height          =   5055
+      Height          =   2895
       Left            =   120
       MultiLine       =   -1  'True
       ScrollBars      =   3  'Both
       TabIndex        =   2
-      Top             =   1080
+      Top             =   3240
       Width           =   8175
    End
    Begin VB.TextBox txtSQL 
       Height          =   855
-      Left            =   120
+      Left            =   240
       ScrollBars      =   3  'Both
       TabIndex        =   1
       Text            =   "SELECT SYSDATE CURRENT_DATE FROM DUAL"
-      Top             =   120
-      Width           =   5655
+      Top             =   600
+      Width           =   5895
    End
    Begin VB.CommandButton btnExecute 
       Caption         =   "Execute"
       Height          =   495
-      Left            =   5880
+      Left            =   6360
       TabIndex        =   0
+      Top             =   960
+      Width           =   1935
+   End
+   Begin VB.Label Label5 
+      Caption         =   "Stored Proc Example"
+      BeginProperty Font 
+         Name            =   "MS Sans Serif"
+         Size            =   12
+         Charset         =   0
+         Weight          =   700
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      Height          =   495
+      Left            =   120
+      TabIndex        =   10
+      Top             =   1680
+      Width           =   5895
+   End
+   Begin VB.Label Label2 
+      Caption         =   "SQL Statement Example"
+      BeginProperty Font 
+         Name            =   "MS Sans Serif"
+         Size            =   12
+         Charset         =   0
+         Weight          =   700
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      Height          =   375
+      Left            =   120
+      TabIndex        =   9
       Top             =   120
-      Width           =   2415
+      Width           =   6015
+   End
+   Begin VB.Label Label4 
+      Caption         =   "User ID"
+      Height          =   255
+      Left            =   120
+      TabIndex        =   7
+      Top             =   2160
+      Width           =   1095
+   End
+   Begin VB.Label Label3 
+      Caption         =   "Created By"
+      Height          =   255
+      Left            =   3840
+      TabIndex        =   6
+      Top             =   2160
+      Width           =   1095
+   End
+   Begin VB.Label Label1 
+      Caption         =   "User Name"
+      Height          =   255
+      Left            =   1680
+      TabIndex        =   5
+      Top             =   2160
+      Width           =   1095
    End
 End
 Attribute VB_Name = "Form1"
@@ -41,63 +131,37 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
-Const g_SEP As String = "--------------------------------------------" + vbCrLf
+Const SEP As String = "--------------------------------------------" + vbCrLf
+Const DATABASE_NAME As String = "xxx" 'From tnsnames.ora
+Const username As String = "xxx"
+Const PASSWORD As String = "xxx"
+Const conn As String = "Provider=OraOLEDB.Oracle;Data Source=" & DATABASE_NAME & ";User ID=" & username & ";Password=" & PASSWORD & ";"
 
 Private Sub btnExecute_Click()
+    Dim result As String
+    MsgBox (conn)
     txtResults.Text = "executing: " + txtSQL.Text + vbCrLf
     'call db connect logic
+    Dim x As New DBUtil
     If (Len(txtSQL.Text) > 0) Then
-        testDbConnection (txtSQL.Text)
+        result = x.testDbConnection(conn, txtSQL.Text)
     Else
-        testDbConnection ("SELECT SYSDATE CURRENT_DATE FROM DUAL")
+        result = x.testDbConnection(conn, "SELECT SYSDATE CURRENT_DATE FROM DUAL")
     End If
-    txtResults.Text = txtResults.Text + vbCrLf + _
+    txtResults.Text = txtResults.Text + result + vbCrLf + _
         "completed... " + vbCrLf + vbCrLf
 End Sub
 
-Private Sub testDbConnection(ByVal strSQL)
-Dim intResult
-Dim strDatabase
-Dim strUserName
-Dim strPassword
-Dim dbDatabase
-
-'On Error Resume Next
-
-
-strDatabase = "xxx" 'From tnsnames.ora
-strUserName = "xxx"
-strPassword = "xxx"
-
-Set mRS = CreateObject("ADODB.Recordset")
-Set dbDatabase = CreateObject("ADODB.Connection")
-
-dbDatabase.ConnectionTimeout = 40
-dbDatabase.ConnectionString = "Provider=OraOLEDB.Oracle;Data Source=" & strDatabase & ";User ID=" & strUserName & ";Password=" & strPassword & ";"
-dbDatabase.Open
-
-If (dbDatabase.State = 1) And (Err = 0) Then
-    mRS.Open strSQL, dbDatabase
-    
-    If mRS.State = 1 Then
-        If Not (mRS.EOF) Then
-           Do While Not mRS.EOF
-                For i = 0 To (mRS.Fields.Count - 1)
-                    txtResults.Text = txtResults.Text & mRS(i) & " "
-                Next
-                txtResults.Text = txtResults.Text & vbCrLf
-                mRS.MoveNext
-            Loop
-        Else
-            txtResults.Text = "No Results Found"
-        End If
-        mRS.Close
+Private Sub btnStoredProcExecute_Click()
+    Dim result As String
+    Dim userId As Integer: userId = txtUserId.Text
+    Dim username As String: username = txtUserName.Text
+    Dim createdBy As String: createdBy = txtCreatedBy.Text
+    If ((Len(userId) <= 0) Or (Len(username) <= 0) Or (Len(createdBy) <= 0)) Then
+        Return
     End If
-Else
-    intResult = MsgBox("Could not connect to the database.  Check your user name and password." & vbCrLf & Error(Err), 16, "Oracle Connection Demo")
-End If
-
-dbDatabase.Close
-Set mRS = Nothing
-Set dbDatabase = Nothing
+    
+    Dim errMsg As String
+    Dim x As New DBUtil
+    result = x.insertUser(conn, userId, username, createdBy, errMsg)
 End Sub
