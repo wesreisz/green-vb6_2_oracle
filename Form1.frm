@@ -13,21 +13,13 @@ Begin VB.Form Form1
       Caption         =   "Execute"
       Height          =   495
       Left            =   6360
-      TabIndex        =   11
+      TabIndex        =   9
       Top             =   2520
       Width           =   1935
    End
-   Begin VB.TextBox txtUserId 
-      Height          =   495
-      Left            =   240
-      TabIndex        =   8
-      Text            =   "99"
-      Top             =   2520
-      Width           =   1215
-   End
    Begin VB.TextBox txtCreatedBy 
       Height          =   495
-      Left            =   3960
+      Left            =   2520
       TabIndex        =   4
       Text            =   "wes"
       Top             =   2520
@@ -35,7 +27,7 @@ Begin VB.Form Form1
    End
    Begin VB.TextBox txtUserName 
       Height          =   495
-      Left            =   1800
+      Left            =   360
       TabIndex        =   3
       Text            =   "sam"
       Top             =   2520
@@ -80,7 +72,7 @@ Begin VB.Form Form1
       EndProperty
       Height          =   495
       Left            =   120
-      TabIndex        =   10
+      TabIndex        =   8
       Top             =   1680
       Width           =   5895
    End
@@ -97,22 +89,14 @@ Begin VB.Form Form1
       EndProperty
       Height          =   375
       Left            =   120
-      TabIndex        =   9
+      TabIndex        =   7
       Top             =   120
       Width           =   6015
-   End
-   Begin VB.Label Label4 
-      Caption         =   "User ID"
-      Height          =   255
-      Left            =   120
-      TabIndex        =   7
-      Top             =   2160
-      Width           =   1095
    End
    Begin VB.Label Label3 
       Caption         =   "Created By"
       Height          =   255
-      Left            =   3840
+      Left            =   2400
       TabIndex        =   6
       Top             =   2160
       Width           =   1095
@@ -120,7 +104,7 @@ Begin VB.Form Form1
    Begin VB.Label Label1 
       Caption         =   "User Name"
       Height          =   255
-      Left            =   1680
+      Left            =   240
       TabIndex        =   5
       Top             =   2160
       Width           =   1095
@@ -146,6 +130,7 @@ Private Sub btnExecute_Click()
     If (Len(txtSQL.Text) > 0) Then
         result = x.testDbConnection(conn, txtSQL.Text)
     Else
+        'if nothing was entered, just get the time from the oracle system tables.
         result = x.testDbConnection(conn, "SELECT SYSDATE CURRENT_DATE FROM DUAL")
     End If
     txtResults.Text = txtResults.Text + result + vbCrLf + _
@@ -154,14 +139,19 @@ End Sub
 
 Private Sub btnStoredProcExecute_Click()
     Dim result As String
-    Dim userId As Integer: userId = txtUserId.Text
     Dim username As String: username = txtUserName.Text
     Dim createdBy As String: createdBy = txtCreatedBy.Text
-    If ((Len(userId) <= 0) Or (Len(username) <= 0) Or (Len(createdBy) <= 0)) Then
+    If ((Len(username) <= 0) Or (Len(createdBy) <= 0)) Then
         Return
     End If
     
     Dim errMsg As String
-    Dim x As New DBUtil
-    result = x.insertUser(conn, userId, username, createdBy, errMsg)
+    Dim db As New DBUtil
+    result = db.insertUser(conn, username, createdBy, errMsg)
+    If (result = "success") Then
+        txtResults.Text = "Record added"
+    Else
+        txtResults.Text = errMsg
+    End If
+    
 End Sub
