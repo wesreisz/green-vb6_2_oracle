@@ -1,21 +1,29 @@
 VERSION 5.00
 Begin VB.Form Form1 
    Caption         =   "Form1"
-   ClientHeight    =   6225
+   ClientHeight    =   7590
    ClientLeft      =   60
    ClientTop       =   450
    ClientWidth     =   8340
    LinkTopic       =   "Form1"
-   ScaleHeight     =   6225
+   ScaleHeight     =   7590
    ScaleWidth      =   8340
    StartUpPosition =   3  'Windows Default
+   Begin VB.CommandButton btnListAll 
+      Caption         =   "List All"
+      Height          =   495
+      Left            =   360
+      TabIndex        =   10
+      Top             =   3720
+      Width           =   7575
+   End
    Begin VB.CommandButton btnStoredProcExecute 
       Caption         =   "Execute"
       Height          =   495
-      Left            =   6360
+      Left            =   4800
       TabIndex        =   9
       Top             =   2520
-      Width           =   1935
+      Width           =   1335
    End
    Begin VB.TextBox txtCreatedBy 
       Height          =   495
@@ -34,12 +42,12 @@ Begin VB.Form Form1
       Width           =   1815
    End
    Begin VB.TextBox txtResults 
-      Height          =   2895
+      Height          =   3015
       Left            =   120
       MultiLine       =   -1  'True
       ScrollBars      =   3  'Both
       TabIndex        =   2
-      Top             =   3240
+      Top             =   4320
       Width           =   8175
    End
    Begin VB.TextBox txtSQL 
@@ -57,7 +65,24 @@ Begin VB.Form Form1
       Left            =   6360
       TabIndex        =   0
       Top             =   960
-      Width           =   1935
+      Width           =   1695
+   End
+   Begin VB.Label Label4 
+      Caption         =   "Stored Proc List Example"
+      BeginProperty Font 
+         Name            =   "MS Sans Serif"
+         Size            =   12
+         Charset         =   0
+         Weight          =   700
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      Height          =   495
+      Left            =   120
+      TabIndex        =   11
+      Top             =   3120
+      Width           =   5895
    End
    Begin VB.Label Label5 
       Caption         =   "Stored Proc Example"
@@ -135,6 +160,29 @@ Private Sub btnExecute_Click()
     End If
     txtResults.Text = txtResults.Text + result + vbCrLf + _
         "completed... " + vbCrLf + vbCrLf
+End Sub
+
+Private Sub btnListAll_Click()
+    Dim mRS As ADODB.Recordset
+    Dim errMsg As String
+    Dim db As New DBUtil
+    Set mRS = db.listUsers(conn, errMsg)
+    
+    If mRS.State = 1 Then
+        If Not (mRS.EOF) Then
+           Do While Not mRS.EOF
+                For i = 0 To (mRS.Fields.Count - 1)
+                    results = results & mRS(i) & " "
+                Next
+                results = results & vbCrLf
+                mRS.MoveNext
+            Loop
+        Else
+            results = "No Results Found"
+        End If
+        mRS.Close
+    End If
+    txtResults.Text = results
 End Sub
 
 Private Sub btnStoredProcExecute_Click()
