@@ -64,9 +64,9 @@ Public Function insertUser(ByVal conn, _
 '---ModDate: July 22, 2014
 '---Retval: nothing
 On Error GoTo errList
-    Set dbConn = New ADODB.Connection: Set dbConn = New ADODB.Connection
-    Set dbCommand = New ADODB.command: Set dbCommand = New ADODB.command
-    
+    Dim dbConn As ADODB.Connection: Set dbConn = New ADODB.Connection
+    Dim dbCommand As ADODB.command: Set dbCommand = New ADODB.command
+   
     dbConn.ConnectionTimeout = 40
     dbConn.Open (conn)
     
@@ -119,10 +119,10 @@ Public Function listUsers(ByVal conn As String, _
 '---Retval: Recordset
 On Error GoTo errListUsers
     'open and configure connection
-    Dim dbConn As ADODB.Connection
-    Dim dbCommand As ADODB.command:
+    Dim dbConn As ADODB.Connection: Set dbConn = New ADODB.Connection
+    Dim dbCommand As ADODB.command: Set dbCommand = New ADODB.command
     
-    Set dbConn.ConnectionTimeout = 40
+    dbConn.ConnectionTimeout = 40
     dbConn.Open (conn)
     dbConn.CursorLocation = adUseClient
     Set dbCommand.ActiveConnection = dbConn
