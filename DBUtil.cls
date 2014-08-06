@@ -11,25 +11,27 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-Public Function testDbConnection(ByVal conn, ByVal strSQL) As String
-    Dim intResult
-    Dim strDatabase
-    Dim strUserName
-    Dim strPassword
-    Dim dbDatabase
+Public Function testDbConnection(ByVal conn As String, ByVal strSQL As String) As String
+'---Usage:  Function used to demostrate simple sql calls against oracle 11g
+'---Author: Wesley T. Reisz (wes@wesleyreisz.com)
+'---ModDate: July 22, 2014
+'---Retval: String
+    Dim intResult As Integer
+    Dim strDatabase As String
+    Dim strUserName As String
+    Dim strPassword As String
+    Dim results As String
     
     'On Error Resume Next
+    Dim mRS As ADODB.Recordset: Set mRS = New ADODB.Recordset
+    Dim dbConn As ADODB.Connection: Set dbConn = New ADODB.Connection
     
-    Set mRS = New ADODB.Recordset
-    Set dbDatabase = New ADODB.Connection
+    dbConn.ConnectionTimeout = 40
+    dbConn.ConnectionString = conn
+    dbConn.Open
     
-    dbDatabase.ConnectionTimeout = 40
-    dbDatabase.ConnectionString = conn
-    dbDatabase.Open
-    
-    Dim results As String
-    If (dbDatabase.State = 1) And (Err = 0) Then
-        mRS.Open strSQL, dbDatabase
+    If (dbConn.State = 1) And (Err = 0) Then
+        mRS.Open strSQL, dbConn
         
         If mRS.State = 1 Then
             If Not (mRS.EOF) Then
@@ -50,15 +52,15 @@ Public Function testDbConnection(ByVal conn, ByVal strSQL) As String
         intResult = MsgBox("Could not connect to the database.  Check your user name and password." & vbCrLf & Error(Err), 16, "Oracle Connection Demo")
     End If
     
-    dbDatabase.Close
+    dbConn.Close
     Set mRS = Nothing
-    Set dbDatabase = Nothing
+    Set dbConn = Nothing
 End Function
 
-Public Function insertUser(ByVal conn, _
-                           ByVal mUserName, _
-                           ByVal mCreatedBy, _
-                           ByRef errMsg)
+Public Function insertUser(ByVal conn As String, _
+                           ByVal mUserName As String, _
+                           ByVal mCreatedBy As String, _
+                           ByRef errMsg As String) As String
 '---Usage:  Function used demonstrate adding a record to an oracle db via a stored proc
 '---Author: Wesley T. Reisz (wes@wesleyreisz.com)
 '---ModDate: July 22, 2014
@@ -112,7 +114,7 @@ errList:
 End Function
 
 Public Function listUsers(ByVal conn As String, _
-                          ByRef errMsg) As ADODB.Recordset
+                          ByRef errMsg As String) As ADODB.Recordset
 '---Usage:  ListUsers is used to return a list of users of the system
 '---Author: Wesley T. Reisz (wes@wesleyreisz.com)
 '---ModDate: July 28, 2014
@@ -121,13 +123,12 @@ On Error GoTo errListUsers
     'open and configure connection
     Dim dbConn As ADODB.Connection: Set dbConn = New ADODB.Connection
     Dim dbCommand As ADODB.command: Set dbCommand = New ADODB.command
+    Dim objRS As ADODB.Recordset: Set objRS = New ADODB.Recordset
     
     dbConn.ConnectionTimeout = 40
     dbConn.Open (conn)
     dbConn.CursorLocation = adUseClient
     Set dbCommand.ActiveConnection = dbConn
-    
-    Dim objRS As ADODB.Recordset: Set objRS = New ADODB.Recordset
     
     objRS.CursorType = adOpenStatic
     objRS.LockType = adLockReadOnly
