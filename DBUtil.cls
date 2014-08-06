@@ -55,17 +55,17 @@ Public Function testDbConnection(ByVal conn, ByVal strSQL) As String
     Set dbDatabase = Nothing
 End Function
 
-Public Function insertUser(ByVal conn As String, _
-                           ByVal mUserName As String, _
-                           ByVal mCreatedBy As String, _
-                           ByRef errMsg) As String
+Public Function insertUser(ByVal conn, _
+                           ByVal mUserName, _
+                           ByVal mCreatedBy, _
+                           ByRef errMsg)
 '---Usage:  Function used demonstrate adding a record to an oracle db via a stored proc
 '---Author: Wesley T. Reisz (wes@wesleyreisz.com)
 '---ModDate: July 22, 2014
 '---Retval: nothing
 On Error GoTo errList
     Set dbConn = New ADODB.Connection: Set dbConn = New ADODB.Connection
-    Set dbCommand = New ADODB.command: Set dbCommand = New ADODB.dbCommand
+    Set dbCommand = New ADODB.command: Set dbCommand = New ADODB.command
     
     dbConn.ConnectionTimeout = 40
     dbConn.Open (conn)
@@ -122,7 +122,7 @@ On Error GoTo errListUsers
     Dim dbConn As ADODB.Connection
     Dim dbCommand As ADODB.command:
     
-    dbConn.ConnectionTimeout = 40
+    Set dbConn.ConnectionTimeout = 40
     dbConn.Open (conn)
     dbConn.CursorLocation = adUseClient
     Set dbCommand.ActiveConnection = dbConn
@@ -167,7 +167,7 @@ On Error GoTo errListUsers
     Exit Function
 errListUsers:
     errMsg = Err.Description
-    Err.Raise 651, "Datawrapper(PERSON_PCK)", "Datawrapper (person_pck.listUsers): Failed retrieving open cases from database. " & errMsg
+    Err.Raise 651, "GET_DBUSERS", "Failed retrieving open cases from database. " & errMsg
 End Function
 
 
