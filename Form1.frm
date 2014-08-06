@@ -141,9 +141,9 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 Const SEP As String = "--------------------------------------------" + vbCrLf
-Const DATABASE_NAME As String = "green" 'From tnsnames.ora
-Const username As String = "green"
-Const PASSWORD As String = "passwd"
+Const DATABASE_NAME As String = "XXX" 'From tnsnames.ora
+Const username As String = "XXX"
+Const PASSWORD As String = "XXX"
 Const conn As String = "Provider=OraOLEDB.Oracle;Data Source=" & DATABASE_NAME & ";User ID=" & username & ";Password=" & PASSWORD & ";"
 
 Private Sub btnExecute_Click()
